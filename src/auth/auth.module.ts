@@ -9,9 +9,12 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { hourInSeconds } from './auth.constants';
+import { JwtStrategy } from './auth.strategy';
+import { RolesGuard } from './roles.guard';
 
 @Module({
   imports: [
+    ConfigModule,
     TypeOrmModule.forFeature([User]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
@@ -26,7 +29,8 @@ import { hourInSeconds } from './auth.constants';
     }),
     ConfigModule.forRoot({ envFilePath: ['.env.dev', '.env.prod'] }),
   ],
-  providers: [AuthService, AuthRepository],
+  providers: [AuthService, AuthRepository, JwtStrategy, RolesGuard],
   controllers: [AuthController],
+  exports: [JwtStrategy, PassportModule, AuthRepository],
 })
 export class AuthModule {}

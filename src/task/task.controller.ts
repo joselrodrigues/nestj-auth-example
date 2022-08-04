@@ -8,7 +8,12 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { Role } from 'src/auth/auth.model';
+import { hasRoles } from 'src/auth/roles.decorator';
+import { RolesGuard } from 'src/auth/roles.guard';
 import { EntityNotFoundError } from 'typeorm';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
@@ -17,10 +22,12 @@ import { Task } from './task.model';
 import { TaskService } from './task.service';
 
 @Controller('task')
+@UseGuards(AuthGuard(), RolesGuard)
 export class TaskController {
   constructor(private taskService: TaskService) {}
 
   @Get()
+  @hasRoles(Role.ADMIN)
   getTasks(@Query() filterDto: GetTasksFilterDto): Promise<Task[]> {
     return this.taskService.getTasks(filterDto);
   }
