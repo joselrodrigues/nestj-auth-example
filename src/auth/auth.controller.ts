@@ -25,12 +25,15 @@ export class AuthController {
   }
 
   @Post('/signin')
-  async signIn(@Body() authCrendentials: AuthCrendentialsDto): Promise<void> {
+  async signIn(
+    @Body() authCrendentials: AuthCrendentialsDto,
+  ): Promise<{ accessToken: string }> {
     try {
-      const isCredencialValid = await this.authService.signIn(authCrendentials);
-      if (!isCredencialValid) {
+      const { accessToken } = await this.authService.signIn(authCrendentials);
+      if (!accessToken) {
         throw new Error();
       }
+      return { accessToken };
     } catch (error) {
       throw new NotFoundException('Your credentials are not valid');
     }
